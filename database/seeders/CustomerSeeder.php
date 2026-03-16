@@ -3,14 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\Customer;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class CustomerSeeder extends Seeder
 {
     public function run(): void
     {
-        $userId = User::first()?->id;
+        $userId = 2;
 
         $customers = [
             ['name' => 'Budi Santoso',   'phone' => '081234567890', 'address' => 'Jl. Mawar No. 1'],

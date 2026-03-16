@@ -39,7 +39,18 @@ class CreateTransaction extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['status'] = $data['payment_method'] === 'debt' ? 'unpaid' : 'paid';
+        $data['status']     = $data['payment_method'] === 'debt' ? 'unpaid' : 'paid';
+        $data['user_id']    = auth()->id();
+
+        // FileUpload returns [] when empty — normalize to null
+        if (empty($data['payment_proof']) || is_array($data['payment_proof'])) {
+            $data['payment_proof'] = is_array($data['payment_proof'] ?? null) && !empty($data['payment_proof'])
+                ? array_values($data['payment_proof'])[0]
+                : null;
+        }
+
+        // Strip keys that don't belong in the transactions table
+        unset($data['barcode_scan'], $data['items']);
 
         return $data;
     }

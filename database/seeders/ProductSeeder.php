@@ -4,14 +4,13 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $userId = User::first()?->id;
+        $userId = 2;
         $categories = Category::withoutGlobalScopes()->pluck('id', 'name');
 
         $products = [

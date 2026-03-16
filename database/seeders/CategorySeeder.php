@@ -3,14 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        $userId = User::first()?->id;
+        $userId = 2;
 
         $categories = [
             'Minuman',

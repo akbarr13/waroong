@@ -28,19 +28,27 @@ class AdminPanelProvider extends PanelProvider
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
 <div id="camera-scanner-modal"
+     onclick="if(event.target===this) closeCameraScanner()"
      style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75);
-            z-index:9999; align-items:center; justify-content:center;">
+            z-index:9999; align-items:center; justify-content:center; padding:16px;">
     <div style="background:white; border-radius:12px; padding:20px; width:340px;
-                max-width:92vw; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+                max-width:100%; max-height:90vh; overflow-y:auto;
+                box-shadow:0 8px 32px rgba(0,0,0,0.3);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <strong style="font-size:15px;">📷 Scan Barcode</strong>
             <button onclick="closeCameraScanner()"
-                    style="background:none; border:none; font-size:22px; cursor:pointer; line-height:1;">✕</button>
+                    style="background:#f3f4f6; border:none; border-radius:50%; width:32px; height:32px;
+                           font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
         </div>
         <div id="camera-reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
         <p style="font-size:11px; color:#888; text-align:center; margin-top:10px;">
             Arahkan kamera ke barcode produk
         </p>
+        <button onclick="closeCameraScanner()"
+                style="margin-top:12px; width:100%; padding:10px; background:#ef4444; color:white;
+                       border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">
+            Tutup Kamera
+        </button>
     </div>
 </div>
 
