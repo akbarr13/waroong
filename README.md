@@ -1,25 +1,46 @@
-# Waroong POS
+<div align="center">
 
-Aplikasi Point of Sale (POS) untuk warung kelontong (UMKM) Indonesia. Multi-tenant — setiap user punya warung dan katalog sendiri.
+# 🛒 Waroong POS
 
-## Fitur
+**Aplikasi kasir modern untuk warung kelontong Indonesia**
 
-- **Kasir** — form transaksi dengan keranjang belanja, auto-kalkulasi harga & stok
-- **Metode Pembayaran** — Tunai, QRIS (upload bukti), Kasbon
-- **Manajemen Kasbon** — tracking utang pelanggan, pelunasan langsung dari tabel
-- **Dashboard** — omset harian, keuntungan, kasbon aktif, produk terlaris, stok menipis
-- **Cetak Struk** — format thermal 58mm, auto-print
-- **Barcode Scanner** — scanner fisik (keyboard) & kamera HP
-- **Multi-tenant** — tiap user punya katalog produk, kategori, dan pelanggan sendiri
-- **Login via Google** — tidak perlu daftar manual
+Dibangun di atas Laravel + FilamentPHP. Multi-tenant, mobile-friendly, dan siap pakai.
+
+[![Laravel](https://img.shields.io/badge/Laravel-10.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)](https://laravel.com)
+[![Filament](https://img.shields.io/badge/FilamentPHP-3.x-FDC950?style=flat-square&logo=laravel&logoColor=black)](https://filamentphp.com)
+[![License](https://img.shields.io/badge/License-MIT-22c55e?style=flat-square)](LICENSE)
+
+</div>
+
+---
+
+## Fitur Utama
+
+| Fitur | Keterangan |
+|---|---|
+| 🧾 **Kasir** | Keranjang belanja, auto-kalkulasi subtotal & total |
+| 💳 **Multi Pembayaran** | Tunai, QRIS (upload bukti), Kasbon |
+| 📒 **Manajemen Kasbon** | Tracking utang & pelunasan per pelanggan |
+| 📊 **Dashboard** | Omset, keuntungan, kasbon aktif, produk terlaris |
+| 🖨️ **Cetak Struk** | Format thermal 58mm, auto-print |
+| 📷 **Barcode Scanner** | Scanner fisik & kamera HP |
+| 🏪 **Multi-Tenant** | Tiap user punya warung & katalog sendiri |
+| 🔐 **Login Google** | Daftar & masuk cukup dengan akun Google |
+
+---
 
 ## Tech Stack
 
-- **Laravel 10** + **FilamentPHP v3** (TALL Stack)
-- **MySQL**
-- **Laravel Socialite** (Google OAuth)
+- **[Laravel 10](https://laravel.com)** — Backend framework
+- **[FilamentPHP v3](https://filamentphp.com)** — Admin panel (TALL Stack)
+- **[Laravel Socialite](https://laravel.com/docs/socialite)** — Google OAuth
+- **MySQL** — Database
+
+---
 
 ## Instalasi
+
+### 1. Clone & Install
 
 ```bash
 git clone https://github.com/akbarr13/waroong.git
@@ -29,20 +50,26 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Atur database di `.env`, lalu:
+### 2. Konfigurasi Database
 
-```bash
-php artisan migrate
-php artisan storage:link
-php artisan serve
+Edit `.env`:
+
+```env
+DB_DATABASE=waroong
+DB_USERNAME=root
+DB_PASSWORD=
 ```
 
-## Setup Google OAuth
+### 3. Setup Google OAuth
 
-1. Buat project di [Google Cloud Console](https://console.cloud.google.com)
-2. Buat **OAuth 2.0 Client ID** (Web application)
-3. Tambahkan Authorized redirect URI: `http://localhost:8000/auth/google/callback`
-4. Isi di `.env`:
+1. Buka [Google Cloud Console](https://console.cloud.google.com)
+2. Buat project → **APIs & Services** → **Credentials** → **Create OAuth 2.0 Client ID**
+3. Pilih tipe **Web application**
+4. Tambahkan Authorized redirect URI:
+   ```
+   http://localhost:8000/auth/google/callback
+   ```
+5. Salin Client ID & Secret ke `.env`:
 
 ```env
 GOOGLE_CLIENT_ID=your-client-id
@@ -50,8 +77,18 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
 ```
 
-Akses di `http://localhost:8000/admin` — login dengan Google.
+### 4. Migrasi & Jalankan
+
+```bash
+php artisan migrate
+php artisan storage:link
+php artisan serve
+```
+
+Buka **[http://localhost:8000/admin](http://localhost:8000/admin)** dan login dengan Google.
+
+---
 
 ## Lisensi
 
-MIT
+[MIT](LICENSE) — bebas digunakan dan dimodifikasi.
