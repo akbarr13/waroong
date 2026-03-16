@@ -241,7 +241,7 @@ class TransactionResource extends Resource
                 ->schema([
                     TextInput::make("invoice_number")
                         ->label("Nomor Invoice")
-                        ->default("INV-" . date("Ymd") . "-" . rand(100, 999))
+                        ->default(fn () => "INV-" . date("Ymd") . "-" . strtoupper(substr(uniqid(), -6)))
                         ->readOnly()
                         ->required(),
 

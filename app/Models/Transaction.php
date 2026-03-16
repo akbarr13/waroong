@@ -13,6 +13,15 @@ class Transaction extends Model
 
     protected $guarded = [];
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope('owner', function ($query) {
+            if (auth()->check()) {
+                $query->where('transactions.user_id', auth()->id());
+            }
+        });
+    }
+
     /**
      * Get the user (cashier) that processed the transaction.
      */
