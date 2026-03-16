@@ -6,6 +6,7 @@ use App\Filament\Resources\TransactionResource;
 use App\Models\Product;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\DB;
 
 class CreateTransaction extends CreateRecord
 {
@@ -25,7 +26,16 @@ class CreateTransaction extends CreateRecord
 
         foreach ($this->data['items'] as $item) {
             $product = Product::find($item['product_id']);
-            if ($product && $product->stock < $item['quantity']) {
+            if (! $product) {
+                Notification::make()
+                    ->title('Produk tidak ditemukan')
+                    ->body("Produk dengan ID {$item['product_id']} tidak ada.")
+                    ->danger()
+                    ->send();
+
+                $this->halt();
+            }
+            if ($product->stock < $item['quantity']) {
                 Notification::make()
                     ->title("Stok tidak cukup: {$product->name}")
                     ->body("Stok tersisa: {$product->stock}, kamu minta: {$item['quantity']}")
@@ -57,18 +67,21 @@ class CreateTransaction extends CreateRecord
 
     protected function afterCreate(): void
     {
-        $total = 0;
+        DB::transaction(function () {
+            $total = 0;
 
-        foreach ($this->record->items as $item) {
-            $price = $item->product->selling_price;
-            $subtotal = $price * $item->quantity;
+            foreach ($this->record->items as $item) {
+                $product = Product::lockForUpdate()->find($item->product_id);
+                $price = $product->selling_price;
+                $subtotal = $price * $item->quantity;
 
-            $item->update(['price' => $price, 'subtotal' => $subtotal]);
-            $item->product->decrement('stock', $item->quantity);
+                $item->update(['price' => $price, 'subtotal' => $subtotal]);
+                $product->decrement('stock', $item->quantity);
 
-            $total += $subtotal;
-        }
+                $total += $subtotal;
+            }
 
-        $this->record->update(['total_amount' => $total]);
+            $this->record->update(['total_amount' => $total]);
+        });
     }
 }
