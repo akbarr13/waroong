@@ -48,9 +48,18 @@ class ProductResource extends Resource
                         ->required(),
                     Forms\Components\TextInput::make("sku")
                         ->label("SKU / Barcode")
+                        ->placeholder("Scan barcode atau ketik manual...")
+                        ->prefix("🔍")
+                        ->helperText("Fokus ke field ini lalu scan, atau tap tombol kamera.")
+                        ->suffixAction(
+                            Forms\Components\Actions\Action::make('buka_kamera_sku')
+                                ->icon('heroicon-o-camera')
+                                ->label('Kamera')
+                                ->extraAttributes(['onclick' => "openCameraScanner('sku'); return false;"])
+                        )
                         ->maxLength(255),
                 ])
-                ->columns(2),
+                ->columns(['default' => 1, 'sm' => 2]),
 
             Forms\Components\Section::make("Harga & Stok")
                 ->schema([
@@ -70,7 +79,7 @@ class ProductResource extends Resource
                         ->numeric()
                         ->default(0),
                 ])
-                ->columns(3),
+                ->columns(['default' => 1, 'sm' => 3]),
         ]);
     }
 
@@ -79,19 +88,38 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make("category.name")
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make("name")->searchable(),
+                    ->label("Kategori")
+                    ->sortable()
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
+                Tables\Columns\TextColumn::make("name")
+                    ->label("Nama Barang")
+                    ->searchable(),
                 Tables\Columns\TextColumn::make("sku")
                     ->label("SKU")
-                    ->searchable(),
+                    ->searchable()
+                    ->extraHeaderAttributes(['class' => 'hidden md:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden md:table-cell']),
                 Tables\Columns\TextColumn::make("purchase_price")
-                    ->numeric()
-                    ->sortable(),
+                    ->label("Harga Modal")
+                    ->money('IDR')
+                    ->sortable()
+                    ->extraHeaderAttributes(['class' => 'hidden md:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden md:table-cell']),
                 Tables\Columns\TextColumn::make("selling_price")
-                    ->numeric()
+                    ->label("Harga Jual")
+                    ->money('IDR')
                     ->sortable(),
-                Tables\Columns\TextColumn::make("stock")->numeric()->sortable(),
+                Tables\Columns\TextColumn::make("stock")
+                    ->label("Stok")
+                    ->numeric()
+                    ->sortable()
+                    ->badge()
+                    ->color(fn(int $state): string => match(true) {
+                        $state <= 5 => 'danger',
+                        $state <= 10 => 'warning',
+                        default => 'success',
+                    }),
                 Tables\Columns\TextColumn::make("created_at")
                     ->dateTime()
                     ->sortable()

@@ -10,7 +10,9 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Facades\FilamentView;
 use Filament\Widgets;
+use Illuminate\Support\HtmlString;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -20,13 +22,77 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    private function cameraScannerHtml(): string
+    {
+        return <<<'HTML'
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<div id="camera-scanner-modal"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75);
+            z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:12px; padding:20px; width:340px;
+                max-width:92vw; box-shadow:0 8px 32px rgba(0,0,0,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <strong style="font-size:15px;">📷 Scan Barcode</strong>
+            <button onclick="closeCameraScanner()"
+                    style="background:none; border:none; font-size:22px; cursor:pointer; line-height:1;">✕</button>
+        </div>
+        <div id="camera-reader" style="width:100%; border-radius:8px; overflow:hidden;"></div>
+        <p style="font-size:11px; color:#888; text-align:center; margin-top:10px;">
+            Arahkan kamera ke barcode produk
+        </p>
+    </div>
+</div>
+
+<script>
+let _html5QrCode = null;
+
+function openCameraScanner(targetField = 'barcode_scan') {
+    const modal = document.getElementById('camera-scanner-modal');
+    modal.style.display = 'flex';
+
+    _html5QrCode = new Html5Qrcode('camera-reader');
+    _html5QrCode.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 260, height: 120 } },
+        (decodedText) => {
+            closeCameraScanner();
+            const wire = _getLivewireComponent();
+            if (wire) {
+                wire.set('data.' + targetField, decodedText);
+            }
+        },
+        () => {}
+    ).catch(() => closeCameraScanner());
+}
+
+function closeCameraScanner() {
+    const modal = document.getElementById('camera-scanner-modal');
+    modal.style.display = 'none';
+    if (_html5QrCode) {
+        _html5QrCode.stop().then(() => {
+            _html5QrCode.clear();
+            _html5QrCode = null;
+        }).catch(() => {});
+    }
+}
+
+function _getLivewireComponent() {
+    const el = document.querySelector('[wire\\:id]');
+    if (!el) return null;
+    return Livewire.find(el.getAttribute('wire:id'));
+}
+</script>
+HTML;
+    }
+
     public function panel(Panel $panel): Panel
     {
         return $panel
             ->default()
             ->id("admin")
             ->path("admin")
-            ->login()
+            ->login(\App\Filament\Pages\Auth\Login::class)
             ->colors([
                 "primary" => Color::Emerald, // Warna hijau segar untuk tema keuangan/warung
             ])
@@ -41,15 +107,12 @@ class AdminPanelProvider extends PanelProvider
                 in: app_path("Filament/Pages"),
                 for: "App\\Filament\\Pages",
             )
-            ->pages([Pages\Dashboard::class])
+            ->pages([\App\Filament\Pages\Dashboard::class])
             ->discoverWidgets(
                 in: app_path("Filament/Widgets"),
                 for: "App\\Filament\\Widgets",
             )
-            ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
-            ])
+            ->widgets([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -61,6 +124,7 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->authMiddleware([Authenticate::class]);
+            ->authMiddleware([Authenticate::class])
+            ->renderHook('panels::body.end', fn() => new HtmlString($this->cameraScannerHtml()));
     }
 }

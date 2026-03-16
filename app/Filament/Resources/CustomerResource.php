@@ -11,7 +11,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CustomerResource extends Resource
 {
@@ -37,19 +36,37 @@ class CustomerResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make("name")->searchable(),
-                Tables\Columns\TextColumn::make("phone")->searchable(),
-                Tables\Columns\TextColumn::make("created_at")
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make("updated_at")
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make("name")
+                    ->label("Nama")
+                    ->searchable(),
+                Tables\Columns\TextColumn::make("phone")
+                    ->label("No. HP")
+                    ->searchable()
+                    ->url(fn(Customer $record) => $record->phone ? 'https://wa.me/' . preg_replace('/\D/', '', $record->phone) : null)
+                    ->openUrlInNewTab()
+                    ->icon('heroicon-o-chat-bubble-left-ellipsis')
+                    ->color('success')
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
+                Tables\Columns\TextColumn::make("total_debt")
+                    ->label("Total Utang")
+                    ->getStateUsing(fn(Customer $record) => $record->totalDebt())
+                    ->money('IDR')
+                    ->color(fn($state) => $state > 0 ? 'danger' : 'gray')
+                    ->weight(fn($state) => $state > 0 ? 'bold' : 'normal')
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
+                Tables\Columns\TextColumn::make("has_debt")
+                    ->label("Status")
+                    ->getStateUsing(fn(Customer $record) => $record->totalDebt() === 0 ? 'Lunas' : 'Ada Utang')
+                    ->badge()
+                    ->icon(fn($state) => $state === 'Lunas' ? 'heroicon-o-check-circle' : 'heroicon-o-exclamation-circle')
+                    ->color(fn($state) => $state === 'Lunas' ? 'success' : 'danger'),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('has_debt')
+                    ->label('Punya Kasbon')
+                    ->query(fn(Builder $query) => $query->whereHas('transactions', fn($q) => $q->where('status', 'unpaid'))),
             ])
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([
