@@ -9,7 +9,7 @@ class CustomerSeeder extends Seeder
 {
     public function run(): void
     {
-        $userId = 2;
+        $userId = \App\Models\User::first()?->id;
 
         $customers = [
             ['name' => 'Budi Santoso',   'phone' => '081234567890', 'address' => 'Jl. Mawar No. 1'],

@@ -10,7 +10,7 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $userId = 2;
+        $userId = \App\Models\User::first()?->id;
         $categories = Category::withoutGlobalScopes()->pluck('id', 'name');
 
         $products = [

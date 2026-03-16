@@ -9,7 +9,7 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        $userId = 2;
+        $userId = \App\Models\User::first()?->id;
 
         $categories = [
             'Minuman',
