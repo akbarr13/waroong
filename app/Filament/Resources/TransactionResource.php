@@ -288,7 +288,7 @@ class TransactionResource extends Resource
                     ->weight(fn(Transaction $record) => $record->customer_id ? 'medium' : 'normal')
                     ->icon(fn(Transaction $record) => $record->customer_id ? 'heroicon-m-user' : null)
                     ->url(fn(Transaction $record) => $record->customer_id
-                        ? route('filament.admin.resources.customers.edit', $record->customer_id)
+                        ? route('filament.admin.resources.customers.index')
                         : null
                     )
                     ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
