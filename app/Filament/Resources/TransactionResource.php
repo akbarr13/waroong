@@ -22,6 +22,10 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
+use App\Models\StockLog;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class TransactionResource extends Resource
@@ -107,7 +111,7 @@ class TransactionResource extends Resource
                     ->relationship()
                     ->schema([
                         Select::make("product_id")
-                            ->relationship("product", "name")
+                            ->relationship("product", "name", fn($query) => $query->where('stock', '>', 0))
                             ->label("Pilih Barang")
                             ->searchable()
                             ->required()
@@ -225,6 +229,14 @@ class TransactionResource extends Resource
                             if ($state !== 'qris') $set('payment_proof', null);
                         }),
 
+                    Placeholder::make('denomination_picker')
+                        ->label('Uang Diterima')
+                        ->content(fn() => new HtmlString(view('filament.forms.denomination-picker')->render()))
+                        ->visible(fn(Get $get) => $get('payment_method') === 'cash')
+                        ->hiddenOn('edit'),
+
+                    Hidden::make('payment_received')->default(0)->hiddenOn('edit'),
+
                     FileUpload::make('payment_proof')
                         ->label('Bukti Pembayaran QRIS')
                         ->image()
@@ -277,7 +289,8 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make("invoice_number")
                     ->label("No. Invoice")
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->description(fn(Transaction $record) => 'Rp ' . number_format($record->total_amount, 0, ',', '.') . ' · ' . $record->created_at->format('d/m/Y H:i')),
                 Tables\Columns\TextColumn::make("customer.name")
                     ->label("Pelanggan")
                     ->default("Umum")
@@ -287,7 +300,7 @@ class TransactionResource extends Resource
                     ->weight(fn(Transaction $record) => $record->customer_id ? 'medium' : 'normal')
                     ->icon(fn(Transaction $record) => $record->customer_id ? 'heroicon-m-user' : null)
                     ->url(fn(Transaction $record) => $record->customer_id
-                        ? route('filament.admin.resources.customers.edit', $record->customer_id)
+                        ? route('filament.admin.resources.customers.index')
                         : null
                     )
                     ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
@@ -295,7 +308,9 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make("total_amount")
                     ->label("Total Belanja")
                     ->money('IDR')
-                    ->sortable(),
+                    ->sortable()
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
                 Tables\Columns\TextColumn::make("payment_method")
                     ->label("Metode")
                     ->badge()
@@ -352,12 +367,6 @@ class TransactionResource extends Resource
                     ->toggle(),
             ])
             ->actions([
-                Tables\Actions\Action::make('cetak_struk')
-                    ->label('Cetak')
-                    ->icon('heroicon-o-printer')
-                    ->color('gray')
-                    ->url(fn(Transaction $record) => route('struk', $record))
-                    ->openUrlInNewTab(),
                 Tables\Actions\Action::make('lunasi')
                     ->label('Lunasi')
                     ->icon('heroicon-o-check-circle')
@@ -374,7 +383,41 @@ class TransactionResource extends Resource
                             ->success()
                             ->send();
                     }),
+                Tables\Actions\Action::make('cetak_struk')
+                    ->label('Cetak')
+                    ->icon('heroicon-o-printer')
+                    ->color('gray')
+                    ->url(fn(Transaction $record) => route('struk', $record))
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('delete')
+                    ->label('Hapus')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Transaksi')
+                    ->modalDescription(fn(Transaction $record) => "Hapus transaksi {$record->invoice_number}? Stok produk akan dikembalikan.")
+                    ->action(function (Transaction $record) {
+                        DB::transaction(function () use ($record) {
+                            foreach ($record->items as $item) {
+                                $item->product?->increment('stock', $item->quantity);
+                                StockLog::create([
+                                    'product_id'     => $item->product_id,
+                                    'transaction_id' => null,
+                                    'user_id'        => auth()->id(),
+                                    'type'           => 'in',
+                                    'quantity'       => $item->quantity,
+                                    'note'           => "Hapus transaksi {$record->invoice_number}",
+                                ]);
+                            }
+                            $record->delete();
+                        });
+                        Notification::make()
+                            ->title('Transaksi dihapus')
+                            ->body('Stok produk telah dikembalikan.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -18,8 +18,17 @@ class EditProfile extends BaseEditProfile
 
                 TextInput::make('store_name')
                     ->label('Nama Toko')
-                    ->placeholder('Contoh: Warung Bu Sari')
-                    ->helperText('Nama ini akan tampil di struk belanja.'),
+                    ->placeholder('Contoh: Warung Bu Sari'),
+
+                TextInput::make('store_address')
+                    ->label('Alamat Toko')
+                    ->placeholder('Contoh: Jl. Mawar No. 5, Jakarta'),
+
+                TextInput::make('store_phone')
+                    ->label('No. HP Toko')
+                    ->tel()
+                    ->placeholder('Contoh: 08123456789')
+                    ->helperText('Nama, alamat, dan HP akan tampil di struk belanja.'),
 
                 TextInput::make('email')
                     ->label('Email')

@@ -142,7 +142,12 @@
 
     {{-- Header Toko --}}
     <div class="store-name">{{ strtoupper($transaction->user->store_name ?? 'WAROONG') }}</div>
-    <div class="store-sub">Kasir &amp; Manajemen Warung</div>
+    @if($transaction->user->store_address)
+        <div class="store-sub">{{ $transaction->user->store_address }}</div>
+    @endif
+    @if($transaction->user->store_phone)
+        <div class="store-sub">{{ $transaction->user->store_phone }}</div>
+    @endif
     <div class="divider-solid"></div>
 
     {{-- Info Transaksi --}}

@@ -12,9 +12,9 @@ class Dashboard extends BaseDashboard
         return [
             Action::make('new_transaction')
                 ->label('Transaksi Baru')
-                ->icon('heroicon-o-plus-circle')
-                ->color('success')
-                ->url(route('filament.admin.resources.transactions.create')),
+                ->icon('heroicon-o-plus')
+                ->url(route('filament.admin.resources.transactions.create'))
+                ->extraAttributes(['class' => 'fi-create-transaction-btn']),
         ];
     }
 }

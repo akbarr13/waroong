@@ -87,14 +87,15 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make("name")
+                    ->label("Nama Barang")
+                    ->searchable()
+                    ->description(fn(Product $record): string => ($record->category?->name ?? '') . ' · Rp ' . number_format($record->selling_price, 0, ',', '.')),
                 Tables\Columns\TextColumn::make("category.name")
                     ->label("Kategori")
                     ->sortable()
                     ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
                     ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
-                Tables\Columns\TextColumn::make("name")
-                    ->label("Nama Barang")
-                    ->searchable(),
                 Tables\Columns\TextColumn::make("sku")
                     ->label("SKU")
                     ->searchable()
@@ -109,7 +110,9 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make("selling_price")
                     ->label("Harga Jual")
                     ->money('IDR')
-                    ->sortable(),
+                    ->sortable()
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
                 Tables\Columns\TextColumn::make("stock")
                     ->label("Stok")
                     ->numeric()
@@ -152,7 +155,6 @@ class ProductResource extends Resource
         return [
             "index" => Pages\ListProducts::route("/"),
             "create" => Pages\CreateProduct::route("/create"),
-            "edit" => Pages\EditProduct::route("/{record}/edit"),
         ];
     }
 }

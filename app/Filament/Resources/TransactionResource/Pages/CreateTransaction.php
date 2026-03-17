@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TransactionResource\Pages;
 
 use App\Filament\Resources\TransactionResource;
 use App\Models\Product;
+use App\Models\StockLog;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,20 @@ class CreateTransaction extends CreateRecord
             Notification::make()
                 ->title('Keranjang kosong')
                 ->body('Tambahkan barang sebelum menyimpan transaksi.')
+                ->danger()
+                ->send();
+
+            $this->halt();
+        }
+
+        if (
+            ($this->data['payment_method'] ?? '') === 'cash' &&
+            ($this->data['payment_received'] ?? 0) > 0 &&
+            ($this->data['payment_received'] ?? 0) < ($this->data['total_amount'] ?? 0)
+        ) {
+            Notification::make()
+                ->title('Uang tidak cukup')
+                ->body('Uang diterima kurang dari total belanjaan.')
                 ->danger()
                 ->send();
 
@@ -60,7 +75,7 @@ class CreateTransaction extends CreateRecord
         }
 
         // Strip keys that don't belong in the transactions table
-        unset($data['barcode_scan'], $data['items']);
+        unset($data['barcode_scan'], $data['items'], $data['payment_received']);
 
         return $data;
     }
@@ -87,6 +102,15 @@ class CreateTransaction extends CreateRecord
 
                     $item->update(['price' => $price, 'subtotal' => $subtotal]);
                     $product->decrement('stock', $item->quantity);
+
+                    StockLog::create([
+                        'product_id'     => $product->id,
+                        'transaction_id' => $this->record->id,
+                        'user_id'        => auth()->id(),
+                        'type'           => 'out',
+                        'quantity'       => $item->quantity,
+                        'note'           => "Transaksi {$this->record->invoice_number}",
+                    ]);
 
                     $total += $subtotal;
                 }

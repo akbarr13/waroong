@@ -15,8 +15,10 @@ class ListCategories extends ListRecords
         return [
             Actions\CreateAction::make()
                 ->label("Tambah Kategori")
+                ->icon('heroicon-o-plus')
                 ->modalHeading("Buat Kategori Baru")
-                ->modalWidth("sm"),
+                ->modalWidth("sm")
+                ->extraAttributes(['class' => 'fi-create-transaction-btn']),
         ];
     }
 }

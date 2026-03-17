@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,3 +29,8 @@ Route::get('/struk/{transaction}', function (\App\Models\Transaction $transactio
     $transaction->load('items.product', 'customer', 'user');
     return view('struk', compact('transaction'));
 })->middleware(['auth'])->name('struk');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/laporan/csv',   [LaporanController::class, 'exportCsv'])->name('laporan.csv');
+    Route::get('/laporan/print', [LaporanController::class, 'cetakPdf'])->name('laporan.print');
+});

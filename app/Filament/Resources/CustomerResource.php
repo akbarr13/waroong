@@ -38,7 +38,8 @@ class CustomerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make("name")
                     ->label("Nama")
-                    ->searchable(),
+                    ->searchable()
+                    ->description(fn(Customer $record): ?string => $record->phone ?? null),
                 Tables\Columns\TextColumn::make("phone")
                     ->label("No. HP")
                     ->searchable()
@@ -88,7 +89,6 @@ class CustomerResource extends Resource
         return [
             "index" => Pages\ListCustomers::route("/"),
             "create" => Pages\CreateCustomer::route("/create"),
-            "edit" => Pages\EditCustomer::route("/{record}/edit"),
         ];
     }
 }

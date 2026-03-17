@@ -1,5 +1,10 @@
 <x-filament-panels::page.simple>
     <div class="flex flex-col items-center gap-6 py-4">
+        @if(session('oauth_error'))
+            <div class="w-full rounded-lg bg-danger-50 dark:bg-danger-950 border border-danger-200 dark:border-danger-800 px-4 py-3 text-sm text-danger-700 dark:text-danger-300">
+                {{ session('oauth_error') }}
+            </div>
+        @endif
         <div class="text-center">
             <p class="text-sm text-gray-500 dark:text-gray-400">
                 Masuk untuk mengelola warung Anda
