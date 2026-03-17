@@ -23,9 +23,12 @@ class LowStockWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Produk'),
+                    ->label('Produk')
+                    ->description(fn($record) => ($record->category?->name ?? '') . ' · Rp ' . number_format($record->selling_price, 0, ',', '.')),
                 Tables\Columns\TextColumn::make('category.name')
-                    ->label('Kategori'),
+                    ->label('Kategori')
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
                 Tables\Columns\TextColumn::make('stock')
                     ->label('Sisa Stok')
                     ->badge()
@@ -33,7 +36,9 @@ class LowStockWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('selling_price')
                     ->label('Harga Jual')
                     ->money('IDR')
-                    ->sortable(),
+                    ->sortable()
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
             ])
             ->paginated(false);
     }

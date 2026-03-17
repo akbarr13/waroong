@@ -31,18 +31,23 @@ class TopProductsWidget extends BaseWidget
             )
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')
-                    ->label('Produk'),
+                    ->label('Produk')
+                    ->description(fn($record) => $record->product?->category?->name ?? '-'),
                 Tables\Columns\TextColumn::make('product.category.name')
                     ->label('Kategori')
-                    ->getStateUsing(fn($record) => $record->product?->category?->name ?? '-'),
+                    ->getStateUsing(fn($record) => $record->product?->category?->name ?? '-')
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
                 Tables\Columns\TextColumn::make('total_terjual')
-                    ->label('Total Terjual')
+                    ->label('Terjual')
                     ->suffix(' pcs')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('total_pendapatan')
                     ->label('Pendapatan')
                     ->money('IDR')
-                    ->sortable(),
+                    ->sortable()
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
             ])
             ->paginated(false);
     }

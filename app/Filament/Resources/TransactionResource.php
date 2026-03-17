@@ -278,7 +278,7 @@ class TransactionResource extends Resource
                     ->label("No. Invoice")
                     ->searchable()
                     ->sortable()
-                    ->description(fn(Transaction $record) => 'Rp ' . number_format($record->total_amount, 0, ',', '.')),
+                    ->description(fn(Transaction $record) => 'Rp ' . number_format($record->total_amount, 0, ',', '.') . ' · ' . $record->created_at->format('d/m/Y H:i')),
                 Tables\Columns\TextColumn::make("customer.name")
                     ->label("Pelanggan")
                     ->default("Umum")
