@@ -277,7 +277,8 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make("invoice_number")
                     ->label("No. Invoice")
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->description(fn(Transaction $record) => 'Rp ' . number_format($record->total_amount, 0, ',', '.')),
                 Tables\Columns\TextColumn::make("customer.name")
                     ->label("Pelanggan")
                     ->default("Umum")
@@ -295,7 +296,9 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make("total_amount")
                     ->label("Total Belanja")
                     ->money('IDR')
-                    ->sortable(),
+                    ->sortable()
+                    ->extraHeaderAttributes(['class' => 'hidden sm:table-cell'])
+                    ->extraCellAttributes(['class' => 'hidden sm:table-cell']),
                 Tables\Columns\TextColumn::make("payment_method")
                     ->label("Metode")
                     ->badge()
@@ -358,23 +361,25 @@ class TransactionResource extends Resource
                     ->color('gray')
                     ->url(fn(Transaction $record) => route('struk', $record))
                     ->openUrlInNewTab(),
-                Tables\Actions\Action::make('lunasi')
-                    ->label('Lunasi')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn(Transaction $record) => $record->status === 'unpaid')
-                    ->requiresConfirmation()
-                    ->modalHeading('Lunasi Kasbon')
-                    ->modalDescription(fn(Transaction $record) => "Tandai transaksi {$record->invoice_number} sebagai lunas?")
-                    ->action(function (Transaction $record) {
-                        $record->update(['status' => 'paid']);
-                        Notification::make()
-                            ->title('Kasbon dilunasi')
-                            ->body("Invoice {$record->invoice_number} sudah ditandai lunas.")
-                            ->success()
-                            ->send();
-                    }),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('lunasi')
+                        ->label('Lunasi')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->visible(fn(Transaction $record) => $record->status === 'unpaid')
+                        ->requiresConfirmation()
+                        ->modalHeading('Lunasi Kasbon')
+                        ->modalDescription(fn(Transaction $record) => "Tandai transaksi {$record->invoice_number} sebagai lunas?")
+                        ->action(function (Transaction $record) {
+                            $record->update(['status' => 'paid']);
+                            Notification::make()
+                                ->title('Kasbon dilunasi')
+                                ->body("Invoice {$record->invoice_number} sudah ditandai lunas.")
+                                ->success()
+                                ->send();
+                        }),
+                    Tables\Actions\EditAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
