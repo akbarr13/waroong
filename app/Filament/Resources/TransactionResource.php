@@ -355,12 +355,6 @@ class TransactionResource extends Resource
                     ->toggle(),
             ])
             ->actions([
-                Tables\Actions\Action::make('cetak_struk')
-                    ->label('Cetak')
-                    ->icon('heroicon-o-printer')
-                    ->color('gray')
-                    ->url(fn(Transaction $record) => route('struk', $record))
-                    ->openUrlInNewTab(),
                 Tables\Actions\Action::make('lunasi')
                     ->label('Lunasi')
                     ->icon('heroicon-o-check-circle')
@@ -377,6 +371,12 @@ class TransactionResource extends Resource
                             ->success()
                             ->send();
                     }),
+                Tables\Actions\Action::make('cetak_struk')
+                    ->label('Cetak')
+                    ->icon('heroicon-o-printer')
+                    ->color('gray')
+                    ->url(fn(Transaction $record) => route('struk', $record))
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
