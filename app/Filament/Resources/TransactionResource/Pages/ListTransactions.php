@@ -14,6 +14,8 @@ class ListTransactions extends ListRecords
     {
         return [
             Actions\CreateAction::make()
+                ->label('')
+                ->icon('heroicon-o-plus')
                 ->size(\Filament\Support\Enums\ActionSize::Small),
         ];
     }
