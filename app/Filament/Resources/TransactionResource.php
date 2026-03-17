@@ -23,6 +23,7 @@ use Filament\Forms\Set;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
+use App\Models\StockLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
@@ -398,6 +399,14 @@ class TransactionResource extends Resource
                         DB::transaction(function () use ($record) {
                             foreach ($record->items as $item) {
                                 $item->product?->increment('stock', $item->quantity);
+                                StockLog::create([
+                                    'product_id'     => $item->product_id,
+                                    'transaction_id' => null,
+                                    'user_id'        => auth()->id(),
+                                    'type'           => 'in',
+                                    'quantity'       => $item->quantity,
+                                    'note'           => "Hapus transaksi {$record->invoice_number}",
+                                ]);
                             }
                             $record->delete();
                         });

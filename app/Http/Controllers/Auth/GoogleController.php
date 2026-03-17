@@ -18,8 +18,12 @@ class GoogleController extends Controller
     {
         try {
             $googleUser = Socialite::driver('google')->user();
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            return redirect('/admin/login')
+                ->with('oauth_error', 'Sesi login expired. Silakan coba lagi.');
         } catch (\Exception $e) {
-            return redirect('/admin/login')->withErrors(['email' => 'Login Google gagal. Coba lagi.']);
+            return redirect('/admin/login')
+                ->with('oauth_error', 'Login Google gagal. Pastikan koneksi internet stabil dan coba lagi.');
         }
 
         $user = User::where('google_id', $googleUser->getId())

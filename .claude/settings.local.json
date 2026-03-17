@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(gh repo:*)"
+    ]
+  }
+}

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\TransactionResource\Pages;
 
 use App\Filament\Resources\TransactionResource;
 use App\Models\Product;
+use App\Models\StockLog;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\DB;
@@ -87,6 +88,15 @@ class CreateTransaction extends CreateRecord
 
                     $item->update(['price' => $price, 'subtotal' => $subtotal]);
                     $product->decrement('stock', $item->quantity);
+
+                    StockLog::create([
+                        'product_id'     => $product->id,
+                        'transaction_id' => $this->record->id,
+                        'user_id'        => auth()->id(),
+                        'type'           => 'out',
+                        'quantity'       => $item->quantity,
+                        'note'           => "Transaksi {$this->record->invoice_number}",
+                    ]);
 
                     $total += $subtotal;
                 }
