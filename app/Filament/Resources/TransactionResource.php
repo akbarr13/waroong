@@ -111,7 +111,7 @@ class TransactionResource extends Resource
                     ->relationship()
                     ->schema([
                         Select::make("product_id")
-                            ->relationship("product", "name")
+                            ->relationship("product", "name", fn($query) => $query->where('stock', '>', 0))
                             ->label("Pilih Barang")
                             ->searchable()
                             ->required()
