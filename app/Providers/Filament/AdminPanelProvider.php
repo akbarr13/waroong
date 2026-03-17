@@ -142,6 +142,10 @@ HTML;
                     #transaction-fab { display: none; }
                     @media (max-width: 639px) { #transaction-fab { display: flex; } }
                     #transaction-fab:active { transform: scale(0.95) !important; }
+                    @media (max-width: 639px) {
+                        .fi-create-transaction-btn .fi-btn-label { display: none; }
+                        .fi-create-transaction-btn { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+                    }
                 </style>
                 <a id="transaction-fab" href="{$url}" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;align-items:center;gap:0.5rem;padding:0 1.25rem 0 1rem;height:3.25rem;border-radius:9999px;box-shadow:0 10px 25px rgba(0,0,0,0.35);background-color:#059669;color:white;text-decoration:none;transition:transform 0.1s;">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" style="width:22px;height:22px;flex-shrink:0;">
