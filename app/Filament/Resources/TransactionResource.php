@@ -361,25 +361,23 @@ class TransactionResource extends Resource
                     ->color('gray')
                     ->url(fn(Transaction $record) => route('struk', $record))
                     ->openUrlInNewTab(),
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('lunasi')
-                        ->label('Lunasi')
-                        ->icon('heroicon-o-check-circle')
-                        ->color('success')
-                        ->visible(fn(Transaction $record) => $record->status === 'unpaid')
-                        ->requiresConfirmation()
-                        ->modalHeading('Lunasi Kasbon')
-                        ->modalDescription(fn(Transaction $record) => "Tandai transaksi {$record->invoice_number} sebagai lunas?")
-                        ->action(function (Transaction $record) {
-                            $record->update(['status' => 'paid']);
-                            Notification::make()
-                                ->title('Kasbon dilunasi')
-                                ->body("Invoice {$record->invoice_number} sudah ditandai lunas.")
-                                ->success()
-                                ->send();
-                        }),
-                    Tables\Actions\EditAction::make(),
-                ]),
+                Tables\Actions\Action::make('lunasi')
+                    ->label('Lunasi')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn(Transaction $record) => $record->status === 'unpaid')
+                    ->requiresConfirmation()
+                    ->modalHeading('Lunasi Kasbon')
+                    ->modalDescription(fn(Transaction $record) => "Tandai transaksi {$record->invoice_number} sebagai lunas?")
+                    ->action(function (Transaction $record) {
+                        $record->update(['status' => 'paid']);
+                        Notification::make()
+                            ->title('Kasbon dilunasi')
+                            ->body("Invoice {$record->invoice_number} sudah ditandai lunas.")
+                            ->success()
+                            ->send();
+                    }),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
