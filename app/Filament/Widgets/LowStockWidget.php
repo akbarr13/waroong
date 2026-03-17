@@ -32,6 +32,7 @@ class LowStockWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('stock')
                     ->label('Sisa Stok')
                     ->badge()
+                    ->alignCenter()
                     ->color(fn(int $state): string => $state <= 5 ? 'danger' : 'warning'),
                 Tables\Columns\TextColumn::make('selling_price')
                     ->label('Harga Jual')

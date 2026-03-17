@@ -41,7 +41,8 @@ class TopProductsWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('total_terjual')
                     ->label('Terjual')
                     ->suffix(' pcs')
-                    ->sortable(),
+                    ->sortable()
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('total_pendapatan')
                     ->label('Pendapatan')
                     ->money('IDR')
