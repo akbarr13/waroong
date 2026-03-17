@@ -13,8 +13,7 @@ class ListTransactions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
-                ->extraAttributes(['class' => 'hidden sm:flex']),
+            Actions\CreateAction::make(),
         ];
     }
 
