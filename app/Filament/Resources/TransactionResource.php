@@ -22,6 +22,9 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class TransactionResource extends Resource
@@ -225,6 +228,12 @@ class TransactionResource extends Resource
                             if ($state !== 'qris') $set('payment_proof', null);
                         }),
 
+                    Placeholder::make('denomination_picker')
+                        ->label('Uang Diterima')
+                        ->content(fn() => new HtmlString(view('filament.forms.denomination-picker')->render()))
+                        ->visible(fn(Get $get) => $get('payment_method') === 'cash')
+                        ->hiddenOn('edit'),
+
                     FileUpload::make('payment_proof')
                         ->label('Bukti Pembayaran QRIS')
                         ->image()
@@ -378,6 +387,26 @@ class TransactionResource extends Resource
                     ->url(fn(Transaction $record) => route('struk', $record))
                     ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('delete')
+                    ->label('Hapus')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Hapus Transaksi')
+                    ->modalDescription(fn(Transaction $record) => "Hapus transaksi {$record->invoice_number}? Stok produk akan dikembalikan.")
+                    ->action(function (Transaction $record) {
+                        DB::transaction(function () use ($record) {
+                            foreach ($record->items as $item) {
+                                $item->product?->increment('stock', $item->quantity);
+                            }
+                            $record->delete();
+                        });
+                        Notification::make()
+                            ->title('Transaksi dihapus')
+                            ->body('Stok produk telah dikembalikan.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
