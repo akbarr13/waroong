@@ -141,7 +141,7 @@
 <body>
 
     {{-- Header Toko --}}
-    <div class="store-name">WAROONG</div>
+    <div class="store-name">{{ strtoupper($transaction->user->store_name ?? 'WAROONG') }}</div>
     <div class="store-sub">Kasir &amp; Manajemen Warung</div>
     <div class="divider-solid"></div>
 
