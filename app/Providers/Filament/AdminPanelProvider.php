@@ -134,6 +134,21 @@ HTML;
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([Authenticate::class])
-            ->renderHook('panels::body.end', fn() => new HtmlString($this->cameraScannerHtml()));
+            ->renderHook('panels::body.end', fn() => new HtmlString($this->cameraScannerHtml()))
+            ->renderHook('panels::body.end', function () {
+                if (!request()->routeIs('filament.admin.resources.transactions.index')) {
+                    return '';
+                }
+                $url = route('filament.admin.resources.transactions.create');
+                return new HtmlString(<<<HTML
+                <a href="{$url}"
+                   class="sm:hidden fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-xl bg-primary-600 hover:bg-primary-500 active:bg-primary-700 text-white transition-colors"
+                   style="background-color: var(--c-primary-600, #059669);">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width:28px;height:28px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                </a>
+                HTML);
+            });
     }
 }

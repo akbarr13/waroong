@@ -5,7 +5,6 @@ namespace App\Filament\Resources\TransactionResource\Pages;
 use App\Filament\Resources\TransactionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Illuminate\Contracts\View\View;
 
 class ListTransactions extends ListRecords
 {
@@ -19,8 +18,5 @@ class ListTransactions extends ListRecords
         ];
     }
 
-    public function getFooter(): ?View
-    {
-        return view('filament.pages.transactions-fab');
-    }
+
 }
