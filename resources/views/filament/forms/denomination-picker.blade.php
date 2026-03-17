@@ -6,8 +6,14 @@
             totalAmount: $wire.$entangle('data.total_amount'),
             get received() { return this.selected.reduce((sum, i) => sum + i.val, 0); },
             get change() { return Math.max(0, this.received - (parseFloat(this.totalAmount) || 0)); },
-            add(val) { this.selected.push({ id: Date.now() + Math.random(), val }); },
-            remove(id) { this.selected = this.selected.filter(s => s.id !== id); },
+            add(val) {
+                this.selected.push({ id: Date.now() + Math.random(), val });
+                $wire.set('data.payment_received', this.received);
+            },
+            remove(id) {
+                this.selected = this.selected.filter(s => s.id !== id);
+                $wire.set('data.payment_received', this.received);
+            },
             format(val) { return 'Rp ' + Math.floor(val).toLocaleString('id-ID'); }
         }"
         class="space-y-3"

@@ -235,6 +235,8 @@ class TransactionResource extends Resource
                         ->visible(fn(Get $get) => $get('payment_method') === 'cash')
                         ->hiddenOn('edit'),
 
+                    Hidden::make('payment_received')->default(0)->hiddenOn('edit'),
+
                     FileUpload::make('payment_proof')
                         ->label('Bukti Pembayaran QRIS')
                         ->image()

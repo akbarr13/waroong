@@ -25,6 +25,20 @@ class CreateTransaction extends CreateRecord
             $this->halt();
         }
 
+        if (
+            ($this->data['payment_method'] ?? '') === 'cash' &&
+            ($this->data['payment_received'] ?? 0) > 0 &&
+            ($this->data['payment_received'] ?? 0) < ($this->data['total_amount'] ?? 0)
+        ) {
+            Notification::make()
+                ->title('Uang tidak cukup')
+                ->body('Uang diterima kurang dari total belanjaan.')
+                ->danger()
+                ->send();
+
+            $this->halt();
+        }
+
         foreach ($this->data['items'] as $item) {
             $product = Product::find($item['product_id']);
             if (! $product) {
@@ -61,7 +75,7 @@ class CreateTransaction extends CreateRecord
         }
 
         // Strip keys that don't belong in the transactions table
-        unset($data['barcode_scan'], $data['items']);
+        unset($data['barcode_scan'], $data['items'], $data['payment_received']);
 
         return $data;
     }
