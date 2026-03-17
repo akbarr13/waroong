@@ -127,8 +127,16 @@ class TransactionResource extends Resource
                                     $set("price", $product->selling_price);
                                     $set("subtotal", $subtotal);
 
+                                    // Gunakan subtotal baru untuk item ini, bukan dari state
+                                    // (state mungkin belum diperbarui saat $get('../../items') dipanggil)
                                     $items = $get("../../items") ?? [];
-                                    $set("../../total_amount", collect($items)->sum("subtotal"));
+                                    $total = collect($items)->reduce(function ($carry, $item) use ($state, $subtotal) {
+                                        if (($item['product_id'] ?? null) == $state) {
+                                            return $carry + $subtotal;
+                                        }
+                                        return $carry + ($item['subtotal'] ?? 0);
+                                    }, 0);
+                                    $set("../../total_amount", $total);
                                 }
                             })
                             ->columnSpan(['default' => 'full', 'md' => 5]),
@@ -144,8 +152,17 @@ class TransactionResource extends Resource
                                 $price = $get('price') ?? 0;
                                 $subtotal = $price * ($state ?? 0);
                                 $set('subtotal', $subtotal);
+
+                                // Gunakan subtotal baru untuk item ini, bukan dari state
+                                $productId = $get('product_id');
                                 $items = $get('../../items') ?? [];
-                                $set('../../total_amount', collect($items)->sum('subtotal'));
+                                $total = collect($items)->reduce(function ($carry, $item) use ($productId, $subtotal) {
+                                    if (($item['product_id'] ?? null) == $productId) {
+                                        return $carry + $subtotal;
+                                    }
+                                    return $carry + ($item['subtotal'] ?? 0);
+                                }, 0);
+                                $set('../../total_amount', $total);
                             })
                             ->columnSpan(['default' => 2, 'md' => 2]),
 

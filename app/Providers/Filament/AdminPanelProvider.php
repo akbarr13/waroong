@@ -101,6 +101,7 @@ HTML;
             ->id("admin")
             ->path("admin")
             ->login(\App\Filament\Pages\Auth\Login::class)
+            ->profile(\App\Filament\Pages\Auth\EditProfile::class)
             ->colors([
                 "primary" => Color::Emerald, // Warna hijau segar untuk tema keuangan/warung
             ])

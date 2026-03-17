@@ -67,21 +67,44 @@ class CreateTransaction extends CreateRecord
 
     protected function afterCreate(): void
     {
-        DB::transaction(function () {
-            $total = 0;
+        $stockError = null;
 
-            foreach ($this->record->items as $item) {
-                $product = Product::lockForUpdate()->find($item->product_id);
-                $price = $product->selling_price;
-                $subtotal = $price * $item->quantity;
+        try {
+            DB::transaction(function () use (&$stockError) {
+                $total = 0;
 
-                $item->update(['price' => $price, 'subtotal' => $subtotal]);
-                $product->decrement('stock', $item->quantity);
+                foreach ($this->record->items as $item) {
+                    $product = Product::lockForUpdate()->find($item->product_id);
 
-                $total += $subtotal;
-            }
+                    // Re-check stock inside the lock to prevent race condition
+                    if ($product->stock < $item->quantity) {
+                        $stockError = "Stok tidak cukup: {$product->name}. Tersisa: {$product->stock}, diminta: {$item->quantity}";
+                        throw new \RuntimeException($stockError);
+                    }
 
-            $this->record->update(['total_amount' => $total]);
-        });
+                    $price = $product->selling_price;
+                    $subtotal = $price * $item->quantity;
+
+                    $item->update(['price' => $price, 'subtotal' => $subtotal]);
+                    $product->decrement('stock', $item->quantity);
+
+                    $total += $subtotal;
+                }
+
+                $this->record->update(['total_amount' => $total]);
+            });
+        } catch (\RuntimeException $e) {
+            // DB transaction rolled back — clean up the orphaned transaction record
+            $this->record->items()->delete();
+            $this->record->delete();
+
+            Notification::make()
+                ->title('Transaksi gagal')
+                ->body($stockError)
+                ->danger()
+                ->send();
+
+            $this->halt();
+        }
     }
 }
