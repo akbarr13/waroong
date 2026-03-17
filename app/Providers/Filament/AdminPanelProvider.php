@@ -145,6 +145,7 @@ HTML;
                     @media (max-width: 639px) {
                         .fi-create-transaction-btn .fi-btn-label { display: none; }
                         .fi-create-transaction-btn { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+                        .fi-page-header { flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 0.5rem !important; }
                     }
                 </style>
                 <a id="transaction-fab" href="{$url}" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;align-items:center;gap:0.5rem;padding:0 1.25rem 0 1rem;height:3.25rem;border-radius:9999px;box-shadow:0 10px 25px rgba(0,0,0,0.35);background-color:#059669;color:white;text-decoration:none;transition:transform 0.1s;">
