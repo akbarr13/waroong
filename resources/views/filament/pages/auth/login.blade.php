@@ -1,16 +1,24 @@
 <x-filament-panels::page.simple>
     <style>
         /* ── Background ── */
-        html, body, .fi-body, .fi-simple-layout {
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
             background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #a7f3d0 100%) !important;
-            min-height: 100vh;
         }
-        .fi-simple-main {
+        .fi-body, .fi-simple-layout, .fi-simple-main {
             background: transparent !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            min-height: 100vh;
+            min-height: unset !important;
+        }
+        .login-wrapper {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
         }
 
         /* ── Sembunyikan header bawaan Filament ── */
@@ -157,6 +165,7 @@
         }
     </style>
 
+    <div class="login-wrapper">
     <div class="login-card">
 
         {{-- Brand --}}
@@ -198,5 +207,6 @@
             &copy; {{ date('Y') }} Waroong &mdash; Aplikasi kasir untuk warung Indonesia
         </div>
 
+    </div>
     </div>
 </x-filament-panels::page.simple>
