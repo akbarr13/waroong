@@ -137,7 +137,7 @@ HTML;
             ->renderHook('panels::body.end', fn() => new HtmlString($this->cameraScannerHtml()))
             ->renderHook('panels::body.end', function () {
                 $route = request()->route()?->getName() ?? '';
-                if (str_contains($route, '.create') || str_contains($route, '.edit')) {
+                if (str_contains($route, '.create') || str_contains($route, '.edit') || str_contains($route, 'auth.')) {
                     return '';
                 }
                 $url = route('filament.admin.resources.transactions.create');
