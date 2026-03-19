@@ -5,6 +5,11 @@
             background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #a7f3d0 100%) !important;
             min-height: 100vh;
         }
+        .fi-simple-main {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
 
         /* ── Sembunyikan header bawaan Filament ── */
         .fi-simple-header {
