@@ -1,12 +1,14 @@
 <x-filament-panels::page.simple>
     <style>
         /* ── Background ── */
-        .fi-simple-main {
+        body, .fi-body, .fi-simple-layout, .fi-simple-main {
             background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 50%, #a7f3d0 100%) !important;
             min-height: 100vh;
         }
-        .fi-simple-layout {
-            background: transparent !important;
+
+        /* ── Sembunyikan header bawaan Filament ── */
+        .fi-simple-header {
+            display: none !important;
         }
 
         /* ── Card ── */
